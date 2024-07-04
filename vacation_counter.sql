@@ -1,98 +1,106 @@
-declare  
-  
-  ferias date := to_date('25/11/2016 17:00:00','dd/mm/yyyy hh24:mi:ss');
-  atual  date := sysdate;
-  dias number(10,0);
-  horas number(10,0);
-  minutos number(10,0);
-  segundos number(10,0);
-  texto varchar2(255);
-  d number(1,0) := 0;
-  h number(1,0) := 0;
-  m number(1,0) := 0;
-  s number(1,0) := 0;
+DECLARE
+    ferias   DATE := TO_DATE ( '25/11/2016 17:00:00', 'dd/mm/yyyy hh24:mi:ss' );
+    atual    DATE := sysdate;
+    dias     NUMBER(10, 0);
+    horas    NUMBER(10, 0);
+    minutos  NUMBER(10, 0);
+    segundos NUMBER(10, 0);
+    texto    VARCHAR2(255);
+    d        NUMBER(1, 0) := 0;
+    h        NUMBER(1, 0) := 0;
+    m        NUMBER(1, 0) := 0;
+    s        NUMBER(1, 0) := 0;
+BEGIN
+    dias := trunc(ferias - atual);
+    horas := trunc(((ferias - atual) - dias) * 24);
+    minutos := trunc((((ferias - atual) - dias) -(horas / 24)) * 24 * 60);
 
-begin
+    segundos := trunc(((((ferias - atual) - dias) -(horas / 24)) -(minutos /(24 * 60))) * 24 * 60 * 60);
 
-dias := trunc(ferias-atual);
-horas := trunc(((ferias-atual)-dias)*24);
-minutos := trunc((((ferias-atual)-dias)-(horas/24))*24*60);
-segundos := trunc(((((ferias-atual)-dias)-(horas/24))-(minutos/(24*60)))*24*60*60);
+    IF ( dias > 0 ) THEN
+        d := 1;
+    END IF;
+    IF ( horas > 0 ) THEN
+        h := 1;
+    END IF;
+    IF ( minutos > 0 ) THEN
+        m := 1;
+    END IF;
+    IF ( segundos > 0 ) THEN
+        s := 1;
+    END IF;
+    texto := NULL;
+    IF ( dias > 0 ) THEN
+        IF ( dias = 1 ) THEN
+            texto := texto
+                     || dias
+                     || ' dia';
+        ELSE
+            texto := texto
+                     || dias
+                     || ' dias';
+        END IF;
 
-if (dias > 0) then
-d := 1;
-end if;
+        IF ( ( h + m + s ) > 1 ) THEN
+            texto := texto || ', ';
+        ELSIF ( ( h + m + s ) = 1 ) THEN
+            texto := texto || ' e ';
+        END IF;
 
-if (horas > 0) then
-h := 1;
-end if;
-if (minutos > 0) then
-m := 1;
-end if;
-if (segundos > 0) then
-s := 1;
-end if;
-  
-texto := null;
+    END IF;
 
-if (dias > 0) then
-if (dias = 1) then
-texto := texto || dias || ' dia' ;
-else
-texto := texto || dias || ' dias' ;
-end if;
+    IF ( horas > 0 ) THEN
+        IF ( horas = 1 ) THEN
+            texto := texto
+                     || horas
+                     || ' hora';
+        ELSE
+            texto := texto
+                     || horas
+                     || ' horas';
+        END IF;
 
-if 
-((h+m+s) > 1) then
-texto := texto || ', ';
-elsif
-((h+m+s) = 1) then
-texto := texto || ' e ';
-end if;
-end if;
+        IF ( ( m + s ) > 1 ) THEN
+            texto := texto || ', ';
+        ELSIF ( ( m + s ) = 1 ) THEN
+            texto := texto || ' e ';
+        END IF;
 
-if (horas > 0) then
-if (horas = 1) then
-texto := texto || horas || ' hora' ;
-else
-texto := texto || horas || ' horas' ;
-end if;
+    END IF;
 
-if 
-((m+s) > 1) then
-texto := texto || ', ';
-elsif
-((m+s) = 1) then
-texto := texto || ' e ';
-end if;
-end if;
+    IF ( minutos > 0 ) THEN
+        IF ( minutos = 1 ) THEN
+            texto := texto
+                     || minutos
+                     || ' minuto';
+        ELSE
+            texto := texto
+                     || minutos
+                     || ' minutos';
+        END IF;
 
-if (minutos > 0) then
-if (minutos = 1) then
-texto := texto || minutos || ' minuto';
-else
-texto := texto || minutos || ' minutos';
-end if;
+        IF ( s = 1 ) THEN
+            texto := texto || ' e ';
+        END IF;
+    END IF;
 
-if 
-(s = 1) then
-texto := texto || ' e ';
-end if;
-end if;
+    IF ( segundos > 0 ) THEN
+        IF ( segundos = 1 ) THEN
+            texto := texto
+                     || segundos
+                     || ' segundo';
+        ELSE
+            texto := texto
+                     || segundos
+                     || ' segundos';
+        END IF;
+    END IF;
 
-if (segundos > 0) then
-if (segundos = 1) then
-texto := texto || segundos || ' segundo' ;
-else
-texto := texto || segundos || ' segundos' ;
-end if;
-end if;
-
-texto := '| Faltam ' || texto || ' para as Férias! |';
-  
-dbms_output.put_line(lpad('-',length(texto),'-'));
-dbms_output.put_line(texto);
-dbms_output.put_line(lpad('-',length(texto),'-'));
-
+    texto := '| Faltam '
+             || texto
+             || ' para as Férias! |';
+    dbms_output.put_line(lpad('-', length(texto), '-'));
+    dbms_output.put_line(texto);
+    dbms_output.put_line(lpad('-', length(texto), '-'));
 END;
 /
